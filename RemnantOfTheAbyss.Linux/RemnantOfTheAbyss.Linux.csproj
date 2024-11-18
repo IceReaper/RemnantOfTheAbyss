@@ -1,0 +1,27 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <OutputType>exe</OutputType>
+        <AssemblyName>RemnantOfTheAbyss</AssemblyName>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="MonoGame.Framework.DesktopGL" />
+        <PackageReference Include="MonoGame.Content.Builder.Task" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\RemnantOfTheAbyss\RemnantOfTheAbyss.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <None Include="..\RemnantOfTheAbyss.Assets\**\*.*" CopyToOutputDirectory="PreserveNewest" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <MonoGameContentReference Include="..\RemnantOfTheAbyss\Content.mgcb">
+            <Link>Content.mgcb</Link>
+        </MonoGameContentReference>
+    </ItemGroup>
+
+</Project>

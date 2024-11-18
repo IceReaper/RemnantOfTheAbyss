@@ -1,0 +1,43 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RemnantOfTheAbyss.Linux", "RemnantOfTheAbyss.Linux\RemnantOfTheAbyss.Linux.csproj", "{758F4CC3-A728-97DC-90B8-9D99D1DDB471}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RemnantOfTheAbyss", "RemnantOfTheAbyss\RemnantOfTheAbyss.csproj", "{C201F09F-C1BF-CF8F-660D-C9256E36F357}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".root", ".root", "{0C6DCCD6-7EEF-B0FD-65CF-72D240113B98}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+		.gitignore = .gitignore
+		Directory.Build.props = Directory.Build.props
+		Directory.Packages.props = Directory.Packages.props
+		stylecop.json = stylecop.json
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Eiveo.Trenchbroom.SourceGenerator", "Eiveo.Trenchbroom.SourceGenerator\Eiveo.Trenchbroom.SourceGenerator.csproj", "{F283975D-9DC8-43E3-BC3D-DCEBF0DAA78A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Eiveo.TrenchBroom", "Eiveo.TrenchBroom\Eiveo.TrenchBroom.csproj", "{A2B4BEAE-91EF-4353-95B3-0FAF07A7C1CE}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{758F4CC3-A728-97DC-90B8-9D99D1DDB471}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{758F4CC3-A728-97DC-90B8-9D99D1DDB471}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{758F4CC3-A728-97DC-90B8-9D99D1DDB471}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{758F4CC3-A728-97DC-90B8-9D99D1DDB471}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C201F09F-C1BF-CF8F-660D-C9256E36F357}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C201F09F-C1BF-CF8F-660D-C9256E36F357}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C201F09F-C1BF-CF8F-660D-C9256E36F357}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C201F09F-C1BF-CF8F-660D-C9256E36F357}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F283975D-9DC8-43E3-BC3D-DCEBF0DAA78A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F283975D-9DC8-43E3-BC3D-DCEBF0DAA78A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F283975D-9DC8-43E3-BC3D-DCEBF0DAA78A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F283975D-9DC8-43E3-BC3D-DCEBF0DAA78A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A2B4BEAE-91EF-4353-95B3-0FAF07A7C1CE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A2B4BEAE-91EF-4353-95B3-0FAF07A7C1CE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A2B4BEAE-91EF-4353-95B3-0FAF07A7C1CE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A2B4BEAE-91EF-4353-95B3-0FAF07A7C1CE}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal

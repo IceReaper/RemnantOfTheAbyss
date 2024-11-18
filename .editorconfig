@@ -1,0 +1,22 @@
+﻿root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+trim_trailing_whitespace = true
+insert_final_newline = true
+max_line_length = off
+
+csharp_prefer_braces = when_multiline
+csharp_style_namespace_declarations = file_scoped
+csharp_style_prefer_primary_constructors = false
+csharp_style_var_for_built_in_types = true
+csharp_style_var_when_type_is_apparent = true
+csharp_style_var_elsewhere = true
+
+dotnet_diagnostic.CA1062.severity = none # Validate arguments of public methods
+dotnet_diagnostic.CA1515.severity = none # Consider making public types internal
+
+dotnet_diagnostic.SA1101.severity = none # Prefix Local Calls With This
+dotnet_diagnostic.SA1309.severity = none # Field Names Must Not Begin With Underscore
+dotnet_diagnostic.SA1503.severity = none # Braces Must Not Be Omitted

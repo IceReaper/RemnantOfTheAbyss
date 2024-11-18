@@ -1,0 +1,3 @@
+/importer:EffectImporter
+/processor:EffectProcessor
+/build:Effects/RenderIntoBuffers.fx
