@@ -29,6 +29,9 @@ public class Camera
     /// <summary>Gets or sets the target viewport.</summary>
     public Vector2 TargetViewport { get; set; }
 
+    /// <summary>Gets or sets the zoom.</summary>
+    public float Zoom { get; set; } = 1;
+
     /// <summary>Updates the camera matrices.</summary>
     public void Update()
     {
@@ -48,10 +51,10 @@ public class Camera
 
         WorldViewport = new Viewport(0, 0, framebufferWidth, framebufferHeight);
         Projection = Matrix.CreateOrthographicOffCenter(
-            framebufferWidth / -2f,
-            framebufferWidth / 2f,
-            framebufferHeight / 2f,
-            framebufferHeight / -2f,
+            framebufferWidth / -2f * Zoom,
+            framebufferWidth / 2f * Zoom,
+            framebufferHeight / 2f * Zoom,
+            framebufferHeight / -2f * Zoom,
             short.MinValue,
             short.MaxValue);
 

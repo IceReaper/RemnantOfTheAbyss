@@ -123,6 +123,13 @@ public sealed class GameMain : IDisposable
         if ((_inputManager.IsPressed(Keys.P) && !_inputManager.WasPressed(Keys.P)) || (_inputManager.IsPressed(Buttons.Back) && !_inputManager.WasPressed(Buttons.Back)))
             _deferredRenderer.Debug = !_deferredRenderer.Debug;
 
+        if ((_inputManager.IsPressed(Keys.O) && !_inputManager.WasPressed(Keys.O)) || (_inputManager.IsPressed(Buttons.Start) && !_inputManager.WasPressed(Buttons.Start)))
+        {
+            _world.Simulate2D = !_world.Simulate2D;
+            _camera.TargetViewport = _world.Simulate2D ? new Vector2(640, 480) : _gameWrapper.GraphicsDevice.Viewport.Bounds.Size.ToVector2();
+            _camera.Zoom = _world.Simulate2D ? 1 : Math.Max(640f / _gameWrapper.GraphicsDevice.Viewport.Width, 480f / _gameWrapper.GraphicsDevice.Viewport.Height);
+        }
+
         _world.Update(gameTime);
     }
 

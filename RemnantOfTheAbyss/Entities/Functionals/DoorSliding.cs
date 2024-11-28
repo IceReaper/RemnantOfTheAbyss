@@ -58,7 +58,10 @@ public partial class DoorSliding : Node
     {
         var totalDistance = door.Distance.Length();
         var currentDistance = Math.Min(door.Speed * door._progress, totalDistance);
-        var currentOffset = Microsoft.Xna.Framework.Vector3.Round(Microsoft.Xna.Framework.Vector3.Normalize(door.Distance) * currentDistance / door.Step) * door.Step;
+        var currentOffset = Microsoft.Xna.Framework.Vector3.Normalize(door.Distance) * currentDistance;
+
+        if (door.Parent is World { Simulate2D: true })
+            currentOffset = Microsoft.Xna.Framework.Vector3.Round(currentOffset / door.Step) * door.Step;
 
         foreach (var child in door.Children)
             child.LocalTransform = Matrix.CreateTranslation(currentOffset);
@@ -85,7 +88,10 @@ public partial class DoorSliding : Node
     {
         var totalDistance = door.Distance.Length();
         var currentDistance = totalDistance - Math.Min(door.Speed * door._progress, totalDistance);
-        var currentOffset = Microsoft.Xna.Framework.Vector3.Round(Microsoft.Xna.Framework.Vector3.Normalize(door.Distance) * currentDistance / door.Step) * door.Step;
+        var currentOffset = Microsoft.Xna.Framework.Vector3.Normalize(door.Distance) * currentDistance;
+
+        if (door.Parent is World { Simulate2D: true })
+            currentOffset = Microsoft.Xna.Framework.Vector3.Round(currentOffset / door.Step) * door.Step;
 
         foreach (var child in door.Children)
             child.LocalTransform = Matrix.CreateTranslation(currentOffset);
