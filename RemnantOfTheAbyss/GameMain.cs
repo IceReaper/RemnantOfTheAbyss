@@ -20,7 +20,7 @@ public sealed class GameMain : IDisposable
     private readonly AssetManager _assetManager;
     private readonly DeferredRenderer _deferredRenderer;
     private readonly Camera _camera;
-    private readonly List<Node> _scene = [];
+    private readonly World _world;
     private readonly InputManager _inputManager;
 
     /// <summary>Initializes a new instance of the <see cref="GameMain"/> class.</summary>
@@ -52,6 +52,8 @@ public sealed class GameMain : IDisposable
             TargetViewport = new Vector2(640, 480),
         };
 
+        _world = new World();
+
         _inputManager = new InputManager();
 
         // TODO hardcoded content
@@ -69,7 +71,7 @@ public sealed class GameMain : IDisposable
         foreach (var entity in map.Entities)
         {
             var node = entitiesLoader.Load(entity);
-            _scene.Add(node);
+            _world.Add(node);
 
             foreach (var mesh in MapLoader.CreateMeshes(entity, _gameWrapper.GraphicsDevice, name => _assetManager.LoadTexture(name, this)))
             {
@@ -121,8 +123,7 @@ public sealed class GameMain : IDisposable
         if ((_inputManager.IsPressed(Keys.P) && !_inputManager.WasPressed(Keys.P)) || (_inputManager.IsPressed(Buttons.Back) && !_inputManager.WasPressed(Buttons.Back)))
             _deferredRenderer.Debug = !_deferredRenderer.Debug;
 
-        foreach (var node in _scene)
-            node.Update(gameTime);
+        _world.Update(gameTime);
     }
 
     /// <summary>Called when the game should draw a frame.</summary>
@@ -134,22 +135,14 @@ public sealed class GameMain : IDisposable
         _camera.Update();
 
         _deferredRenderer.Begin(_camera);
-
-        foreach (var node in _scene)
-            node.Draw(_deferredRenderer);
-
+        _world.Draw(_deferredRenderer);
         _deferredRenderer.End();
     }
 
     /// <inheritdoc />
     public void Dispose()
     {
-        while (_scene.Count > 0)
-        {
-            _scene[0].Dispose();
-            _scene.RemoveAt(0);
-        }
-
+        _world.Dispose();
         _assetManager.Dispose();
         _deferredRenderer.Dispose();
     }
