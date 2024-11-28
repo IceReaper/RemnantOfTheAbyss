@@ -151,7 +151,7 @@ public class GameFetcher
             return null;
 
         if (property.Type.SpecialType == SpecialType.System_String)
-            return propertySyntax.Initializer.Value.ToString();
+            return propertySyntax.Initializer.Value.ToString() == "string.Empty" ? "\"\"" : propertySyntax.Initializer.Value.ToString();
 
         if (property.Type.SpecialType is SpecialType.System_SByte or SpecialType.System_Byte or SpecialType.System_Int16 or SpecialType.System_UInt16 or SpecialType.System_Int32 or SpecialType.System_UInt32 or SpecialType.System_Int64 or SpecialType.System_UInt64)
             return propertySyntax.Initializer.Value.ToString();
@@ -187,7 +187,7 @@ public class GameFetcher
                 : throw new NotSupportedException("Unsupported Vector3 initialization.");
         }
 
-        var exception = new NotSupportedException("Unsupported property type.");
+        var exception = new NotSupportedException("Unsupported property default value type.");
         throw exception;
     }
 

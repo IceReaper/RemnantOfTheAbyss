@@ -60,35 +60,35 @@ public class EntityClassBuilder
 
         foreach (var property in entity.Properties)
         {
-            var variableName = char.ToLowerInvariant(property.Name[0]) + property.Name.Substring(1);
+            var lowercaseName = char.ToLowerInvariant(property.Name[0]) + property.Name.Substring(1);
 
-            _ = sb.AppendLine($"        if (entity.Properties.TryGetValue(\"{property.Name}\", out var {variableName}))");
+            _ = sb.AppendLine($"        if (entity.Properties.TryGetValue(\"{lowercaseName}\", out var {lowercaseName}))");
 
             if (property.Type is "string")
             {
-                _ = sb.AppendLine($"            result.{property.Name} = {variableName};");
+                _ = sb.AppendLine($"            result.{property.Name} = {lowercaseName};");
             }
             else if (property.Type is "sbyte" or "byte" or "short" or "ushort" or "int" or "uint" or "long" or "ulong")
             {
-                _ = sb.AppendLine($"            result.{property.Name} = ({property.Type})long.Parse({variableName}, CultureInfo.InvariantCulture);");
+                _ = sb.AppendLine($"            result.{property.Name} = ({property.Type})long.Parse({lowercaseName}, CultureInfo.InvariantCulture);");
             }
             else if (property.Type is "float" or "double")
             {
-                _ = sb.AppendLine($"            result.{property.Name} = ({property.Type})double.Parse({variableName}, CultureInfo.InvariantCulture);");
+                _ = sb.AppendLine($"            result.{property.Name} = ({property.Type})double.Parse({lowercaseName}, CultureInfo.InvariantCulture);");
             }
             else if (property.Type is "System.Half")
             {
-                _ = sb.AppendLine($"            result.{property.Name} = (Half)double.Parse({variableName}, CultureInfo.InvariantCulture);");
+                _ = sb.AppendLine($"            result.{property.Name} = (Half)double.Parse({lowercaseName}, CultureInfo.InvariantCulture);");
             }
             else if (property.Type is "bool")
             {
-                _ = sb.AppendLine($"            result.{property.Name} = {variableName} != \"0\";");
+                _ = sb.AppendLine($"            result.{property.Name} = {lowercaseName} != \"0\";");
             }
             else if (property.Type is "System.Drawing.Color")
             {
                 _ = sb
                     .AppendLine("        {")
-                    .AppendLine($"            var segments = {variableName}.Split(' ');")
+                    .AppendLine($"            var segments = {lowercaseName}.Split(' ');")
                     .AppendLine()
                     .AppendLine("            if (segments.Length == 3)")
                     .AppendLine($"                result.{property.Name} = Color.FromArgb(byte.Parse(segments[0], CultureInfo.InvariantCulture), byte.Parse(segments[1], CultureInfo.InvariantCulture), byte.Parse(segments[2], CultureInfo.InvariantCulture));")
@@ -100,17 +100,17 @@ public class EntityClassBuilder
             {
                 _ = sb
                     .AppendLine("        {")
-                    .AppendLine($"            var segments = {variableName}.Split(' ');")
+                    .AppendLine($"            var segments = {lowercaseName}.Split(' ');")
                     .AppendLine($"            result.{property.Name} = new Vector3(float.Parse(segments[0], CultureInfo.InvariantCulture), float.Parse(segments[1], CultureInfo.InvariantCulture), float.Parse(segments[2], CultureInfo.InvariantCulture));")
                     .AppendLine("        }");
             }
             else if (property is EnumPropertyInfo enumProperty)
             {
-                _ = sb.AppendLine($"            result.{property.Name} = ({enumProperty.Type.Split('.').Last()})ulong.Parse({variableName}, CultureInfo.InvariantCulture);");
+                _ = sb.AppendLine($"            result.{property.Name} = ({enumProperty.Type.Split('.').Last()})ulong.Parse({lowercaseName}, CultureInfo.InvariantCulture);");
             }
             else if (property is FlagsPropertyInfo flagsProperty)
             {
-                _ = sb.AppendLine($"            result.{property.Name} = ({flagsProperty.Type.Split('.').Last()})ulong.Parse({variableName}, CultureInfo.InvariantCulture);");
+                _ = sb.AppendLine($"            result.{property.Name} = ({flagsProperty.Type.Split('.').Last()})ulong.Parse({lowercaseName}, CultureInfo.InvariantCulture);");
             }
 
             _ = sb.AppendLine();

@@ -2209,7 +2209,8 @@
 // entity 2
 {
 "classname" "func_door_sliding"
-"Distance" "0 0 -48"
+"distance" "48"
+"angles" "0 -90 0"
 "_tb_group" "13"
 // brush 0
 {
@@ -2250,7 +2251,8 @@
 // entity 4
 {
 "classname" "func_door_sliding"
-"Distance" "0 0 48"
+"distance" "48"
+"angles" "0 90 0"
 "_tb_group" "14"
 // brush 0
 {
@@ -2291,7 +2293,8 @@
 // entity 6
 {
 "classname" "func_door_sliding"
-"Distance" "-48 0 0"
+"distance" "48"
+"angles" "0 180 0"
 "_tb_group" "16"
 // brush 0
 {
@@ -2332,7 +2335,7 @@
 // entity 8
 {
 "classname" "func_door_sliding"
-"Distance" "48 0 0"
+"distance" "48"
 "_tb_group" "15"
 // brush 0
 {

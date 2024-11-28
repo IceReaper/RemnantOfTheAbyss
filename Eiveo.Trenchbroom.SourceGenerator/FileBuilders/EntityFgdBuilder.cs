@@ -38,10 +38,12 @@ public class EntityFgdBuilder
 
         foreach (var property in properties)
         {
+            var lowercaseName = char.ToLowerInvariant(property.Name[0]) + property.Name.Substring(1);
+
             if (property is FlagsPropertyInfo flagsProperty)
             {
                 _ = sb
-                    .AppendLine($"    {property.Name}(flags) =")
+                    .AppendLine($"    {lowercaseName}(flags) =")
                     .AppendLine("    [");
 
                 foreach (var value in flagsProperty.Values)
@@ -52,7 +54,7 @@ public class EntityFgdBuilder
             else if (property is EnumPropertyInfo enumProperty)
             {
                 _ = sb
-                    .AppendLine($"    {property.Name}(choices) : \"{property.Description}\"{(property.DefaultValue != null ? $" : {property.DefaultValue}" : string.Empty)} =")
+                    .AppendLine($"    {lowercaseName}(choices) : \"{property.Description}\"{(property.DefaultValue != null ? $" : {property.DefaultValue}" : string.Empty)} =")
                     .AppendLine("    [");
 
                 foreach (var value in enumProperty.Values)
@@ -62,7 +64,7 @@ public class EntityFgdBuilder
             }
             else
             {
-                _ = sb.AppendLine($"    {property.Name}({GetTypeName(property.Type)}) : \"{property.Description}\"{(property.DefaultValue != null ? $" : {property.DefaultValue}" : string.Empty)}");
+                _ = sb.AppendLine($"    {lowercaseName}({GetTypeName(property.Type)}) : \"{property.Description}\"{(property.DefaultValue != null ? $" : {property.DefaultValue}" : string.Empty)}");
             }
         }
 
@@ -76,12 +78,13 @@ public class EntityFgdBuilder
         return type switch
         {
             "string" => "string",
+            "string?" => "string",
             "sbyte" or "byte" or "short" or "ushort" or "int" or "uint" or "long" or "ulong" => "integer",
             "System.Half" or "float" or "double" => "float",
             "bool" => "boolean",
             "System.Drawing.Color" => "color255",
             "System.Numerics.Vector3" => "vector",
-            _ => throw new NotSupportedException(),
+            _ => throw new NotSupportedException("Unsupported property type name"),
         };
     }
 }

@@ -3,6 +3,7 @@
 using Eiveo.TrenchBroom.Attributes;
 using Microsoft.Xna.Framework;
 using RemnantOfTheAbyss.Nodes;
+using Quaternion = System.Numerics.Quaternion;
 using Vector3 = System.Numerics.Vector3;
 
 namespace RemnantOfTheAbyss.Entities.Functionals;
@@ -14,9 +15,13 @@ public partial class DoorSliding : Node
     private Func<DoorSliding, bool> _currentScript = Closed;
     private float _progress;
 
+    /// <summary>Gets or sets the open direction.</summary>
+    [Property("The open direction.")]
+    public Vector3 Angles { get; set; }
+
     /// <summary>Gets or sets the distance the door slides.</summary>
     [Property("The distance the door slides.")]
-    public Vector3 Distance { get; set; } = new(0, 128, 0);
+    public float Distance { get; set; } = 128;
 
     /// <summary>Gets or sets the speed at which the door slides.</summary>
     [Property("The speed at which the door slides.")]
@@ -56,17 +61,18 @@ public partial class DoorSliding : Node
 
     private static bool Opening(DoorSliding door)
     {
-        var totalDistance = door.Distance.Length();
-        var currentDistance = Math.Min(door.Speed * door._progress, totalDistance);
-        var currentOffset = Microsoft.Xna.Framework.Vector3.Normalize(door.Distance) * currentDistance;
+        var angles = door.Angles * MathF.PI / 180;
+        var direction = Vector3.Transform(new Vector3(1, 0, 0), Quaternion.CreateFromYawPitchRoll(-angles.Y, angles.X, angles.Z));
+        var currentDistance = Math.Min(door.Speed * door._progress, door.Distance);
+        var currentOffset = direction * currentDistance;
 
         if (door.Parent is World { Simulate2D: true })
-            currentOffset = Microsoft.Xna.Framework.Vector3.Round(currentOffset / door.Step) * door.Step;
+            currentOffset = Vector3.Round(currentOffset / door.Step) * door.Step;
 
         foreach (var child in door.Children)
             child.LocalTransform = Matrix.CreateTranslation(currentOffset);
 
-        if (currentDistance - totalDistance != 0)
+        if (currentDistance - door.Distance != 0)
             return false;
 
         door._currentScript = Open;
@@ -86,12 +92,13 @@ public partial class DoorSliding : Node
 
     private static bool Closing(DoorSliding door)
     {
-        var totalDistance = door.Distance.Length();
-        var currentDistance = totalDistance - Math.Min(door.Speed * door._progress, totalDistance);
-        var currentOffset = Microsoft.Xna.Framework.Vector3.Normalize(door.Distance) * currentDistance;
+        var angles = door.Angles * MathF.PI / 180;
+        var direction = Vector3.Transform(new Vector3(1, 0, 0), Quaternion.CreateFromYawPitchRoll(-angles.Y, angles.X, angles.Z));
+        var currentDistance = door.Distance - Math.Min(door.Speed * door._progress, door.Distance);
+        var currentOffset = direction * currentDistance;
 
         if (door.Parent is World { Simulate2D: true })
-            currentOffset = Microsoft.Xna.Framework.Vector3.Round(currentOffset / door.Step) * door.Step;
+            currentOffset = Vector3.Round(currentOffset / door.Step) * door.Step;
 
         foreach (var child in door.Children)
             child.LocalTransform = Matrix.CreateTranslation(currentOffset);
