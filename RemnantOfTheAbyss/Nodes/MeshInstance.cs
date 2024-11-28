@@ -1,6 +1,6 @@
 // Copyright (c) Eiveo GmbH. All rights reserved.
 
-using Microsoft.Xna.Framework;
+using System.Numerics;
 using RemnantOfTheAbyss.Graphics;
 
 namespace RemnantOfTheAbyss.Nodes;
@@ -13,6 +13,9 @@ public class MeshInstance : Node
 
     /// <summary>Gets or sets the rotation.</summary>
     public Vector3 Rotation { get; set; }
+
+    /// <summary>Gets or sets the scale.</summary>
+    public Vector3 Scale { get; set; }
 
     /// <summary>Gets the mesh.</summary>
     public required Mesh Mesh { get; init; }

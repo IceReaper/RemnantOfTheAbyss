@@ -32,9 +32,29 @@ public class EntityFgdBuilder
     {
         var sb = new StringBuilder();
 
-        _ = sb
-            .AppendLine($"{(isBrush ? "@SolidClass" : "@PointClass size(-4 -4 -4, 4 4 4)")} = {name} : \"{description}.\"")
-            .AppendLine("[");
+        if (isBrush)
+        {
+            _ = sb.AppendLine($"{"@SolidClass"} = {name} : \"{description}.\"");
+        }
+        else
+        {
+            var modelProperty = properties.OfType<ModelPropertyInfo>().FirstOrDefault();
+            var scaleProperty = properties.OfType<ModelScalePropertyInfo>().FirstOrDefault(scaleProperty => scaleProperty.Model == modelProperty?.Name);
+
+            if (modelProperty == null)
+            {
+                _ = sb.AppendLine($"@PointClass size(-4 -4 -4, 4 4 4) = {name} : \"{description}.\"");
+            }
+            else
+            {
+                var modelPath = $"\"path\": {char.ToLowerInvariant(modelProperty.Name[0])}{modelProperty.Name.Substring(1)}";
+                var scale = scaleProperty?.Name != null ? $", \"scale\": {char.ToLowerInvariant(scaleProperty.Name[0])}{scaleProperty.Name.Substring(1)}" : string.Empty;
+
+                _ = sb.AppendLine($"@PointClass model({{ {modelPath}{scale} }}) = {name} : \"{description}.\"");
+            }
+        }
+
+        _ = sb.AppendLine("[");
 
         foreach (var property in properties)
         {

@@ -1,6 +1,6 @@
 // Copyright (c) Eiveo GmbH. All rights reserved.
 
-using Microsoft.Xna.Framework;
+using System.Numerics;
 using Microsoft.Xna.Framework.Input;
 using RemnantOfTheAbyss.Input.Enums;
 
@@ -112,12 +112,14 @@ public class InputManager
     /// <returns><c>true</c> if the gamepad digital pad button is pressed in this frame; otherwise, <c>false</c>.</returns>
     public bool IsPressed(GamePadDigitalPad gamePadDigitalPad, int gamePadIndex = 0)
     {
+        var dpad = _gamePadCurrent[gamePadIndex].DPad;
+
         return gamePadDigitalPad switch
         {
-            GamePadDigitalPad.Up => _gamePadCurrent[gamePadIndex].DPad.Up == ButtonState.Pressed,
-            GamePadDigitalPad.Down => _gamePadCurrent[gamePadIndex].DPad.Down == ButtonState.Pressed,
-            GamePadDigitalPad.Left => _gamePadCurrent[gamePadIndex].DPad.Left == ButtonState.Pressed,
-            GamePadDigitalPad.Right => _gamePadCurrent[gamePadIndex].DPad.Right == ButtonState.Pressed,
+            GamePadDigitalPad.Up => dpad.Up == ButtonState.Pressed,
+            GamePadDigitalPad.Down => dpad.Down == ButtonState.Pressed,
+            GamePadDigitalPad.Left => dpad.Left == ButtonState.Pressed,
+            GamePadDigitalPad.Right => dpad.Right == ButtonState.Pressed,
             _ => false,
         };
     }
@@ -128,12 +130,14 @@ public class InputManager
     /// <returns><c>true</c> if the gamepad digital pad button was pressed in the last frame; otherwise, <c>false</c>.</returns>
     public bool WasPressed(GamePadDigitalPad gamePadDigitalPad, int gamePadIndex = 0)
     {
+        var dpad = _gamePadLast[gamePadIndex].DPad;
+
         return gamePadDigitalPad switch
         {
-            GamePadDigitalPad.Up => _gamePadLast[gamePadIndex].DPad.Up == ButtonState.Pressed,
-            GamePadDigitalPad.Down => _gamePadLast[gamePadIndex].DPad.Down == ButtonState.Pressed,
-            GamePadDigitalPad.Left => _gamePadLast[gamePadIndex].DPad.Left == ButtonState.Pressed,
-            GamePadDigitalPad.Right => _gamePadLast[gamePadIndex].DPad.Right == ButtonState.Pressed,
+            GamePadDigitalPad.Up => dpad.Up == ButtonState.Pressed,
+            GamePadDigitalPad.Down => dpad.Down == ButtonState.Pressed,
+            GamePadDigitalPad.Left => dpad.Left == ButtonState.Pressed,
+            GamePadDigitalPad.Right => dpad.Right == ButtonState.Pressed,
             _ => false,
         };
     }
@@ -144,10 +148,12 @@ public class InputManager
     /// <returns>The gamepad thumbstick.</returns>
     public Vector2 GetGamePadThumbStick(GamePadThumbStick gamePadThumbStick, int gamePadIndex = 0)
     {
+        var thumbSticks = _gamePadCurrent[gamePadIndex].ThumbSticks;
+
         return gamePadThumbStick switch
         {
-            GamePadThumbStick.Left => _gamePadCurrent[gamePadIndex].ThumbSticks.Left,
-            GamePadThumbStick.Right => _gamePadCurrent[gamePadIndex].ThumbSticks.Right,
+            GamePadThumbStick.Left => thumbSticks.Left.ToNumerics(),
+            GamePadThumbStick.Right => thumbSticks.Right.ToNumerics(),
             _ => Vector2.Zero,
         };
     }
@@ -158,10 +164,12 @@ public class InputManager
     /// <returns>The gamepad trigger.</returns>
     public Vector2 GetGamePadTrigger(GamePadTrigger gamePadTrigger, int gamePadIndex = 0)
     {
+        var triggers = _gamePadCurrent[gamePadIndex].Triggers;
+
         return gamePadTrigger switch
         {
-            GamePadTrigger.Left => new Vector2(_gamePadCurrent[gamePadIndex].Triggers.Left, 0),
-            GamePadTrigger.Right => new Vector2(_gamePadCurrent[gamePadIndex].Triggers.Right, 0),
+            GamePadTrigger.Left => new Vector2(triggers.Left, 0),
+            GamePadTrigger.Right => new Vector2(triggers.Right, 0),
             _ => Vector2.Zero,
         };
     }

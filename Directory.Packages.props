@@ -10,6 +10,7 @@
         <PackageVersion Include="Microsoft.CodeAnalysis.CSharp" Version="4.11.0" />
         <PackageVersion Include="MonoGame.Content.Builder.Task" Version="3.8.2.1105" />
         <PackageVersion Include="MonoGame.Framework.DesktopGL" Version="3.8.2.1105" />
+        <PackageVersion Include="SharpGLTF.Toolkit" Version="1.0.3" />
         <PackageVersion Include="StyleCop.Analyzers" Version="1.2.0-beta.556" />
         <PackageVersion Include="JetBrains.Annotations" Version="2021.3.0" />
     </ItemGroup>

@@ -1,5 +1,6 @@
 // Copyright (c) Eiveo GmbH. All rights reserved.
 
+using System.Drawing;
 using Eiveo.TrenchBroom.Maps;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -10,6 +11,9 @@ using RemnantOfTheAbyss.Graphics;
 using RemnantOfTheAbyss.Input;
 using RemnantOfTheAbyss.Input.Enums;
 using RemnantOfTheAbyss.Nodes;
+using Model = RemnantOfTheAbyss.Assets.Model;
+using Vector2 = System.Numerics.Vector2;
+using Vector3 = System.Numerics.Vector3;
 
 namespace RemnantOfTheAbyss;
 
@@ -38,10 +42,14 @@ public sealed class GameMain : IDisposable
         var dummyTexture = new Texture2D(_gameWrapper.GraphicsDevice, 1, 1);
         dummyTexture.SetData(new byte[] { 0xff, 0x00, 0xff, 0xff });
 
+        // TODO we should make this some dummy cube.
+        var dummyModel = new Model { Meshes = [] };
+
         _assetManager = new AssetManager
         {
             GraphicsDevice = _gameWrapper.GraphicsDevice,
             DummyTexture = dummyTexture,
+            DummyModel = dummyModel,
         };
 
         _deferredRenderer = new DeferredRenderer(_gameWrapper.GraphicsDevice, _gameWrapper.Content);
@@ -49,10 +57,10 @@ public sealed class GameMain : IDisposable
         _camera = new Camera
         {
             Rotation = new Vector3(-45, 135, 0),
-            TargetViewport = new Vector2(640, 480),
+            TargetViewport = new Size(640, 480),
         };
 
-        _world = new World();
+        _world = new World { AssetManager = _assetManager };
 
         _inputManager = new InputManager();
 
@@ -62,8 +70,8 @@ public sealed class GameMain : IDisposable
 
         var map = Map.Read(reader, name =>
         {
-            var texture = _assetManager.LoadTexture(name, this);
-            return new System.Numerics.Vector2(texture.Width, texture.Height);
+            var texture = _assetManager.LoadTexture($"Textures/{name}.png", this);
+            return new Vector2(texture.Width, texture.Height);
         });
 
         var entitiesLoader = new EntitiesLoader();
@@ -73,7 +81,7 @@ public sealed class GameMain : IDisposable
             var node = entitiesLoader.Load(entity);
             _world.Add(node);
 
-            foreach (var mesh in MapLoader.CreateMeshes(entity, _gameWrapper.GraphicsDevice, name => _assetManager.LoadTexture(name, this)))
+            foreach (var mesh in MapLoader.CreateMeshes(entity, _gameWrapper.GraphicsDevice, name => _assetManager.LoadTexture($"Textures/{name}.png", this)))
             {
                 node.Add(new MeshInstance { Mesh = mesh });
             }
@@ -107,7 +115,7 @@ public sealed class GameMain : IDisposable
             move.Y += 1f;
 
         if (move.Length() > 1)
-            move.Normalize();
+            move = Vector3.Normalize(move);
 
         if (move.Length() > 0)
         {
@@ -126,8 +134,19 @@ public sealed class GameMain : IDisposable
         if ((_inputManager.IsPressed(Keys.O) && !_inputManager.WasPressed(Keys.O)) || (_inputManager.IsPressed(Buttons.Start) && !_inputManager.WasPressed(Buttons.Start)))
         {
             _world.Simulate2D = !_world.Simulate2D;
-            _camera.TargetViewport = _world.Simulate2D ? new Vector2(640, 480) : _gameWrapper.GraphicsDevice.Viewport.Bounds.Size.ToVector2();
-            _camera.Zoom = _world.Simulate2D ? 1 : Math.Max(640f / _gameWrapper.GraphicsDevice.Viewport.Width, 480f / _gameWrapper.GraphicsDevice.Viewport.Height);
+
+            if (_world.Simulate2D)
+            {
+                _camera.TargetViewport = new Size(640, 480);
+                _camera.Zoom = 1;
+            }
+        }
+
+        if (!_world.Simulate2D)
+        {
+            var viewport = _gameWrapper.GraphicsDevice.Viewport;
+            _camera.TargetViewport = new Size(viewport.Width, viewport.Height);
+            _camera.Zoom = Math.Max(640f / viewport.Width, 480f / viewport.Height);
         }
 
         _world.Update(gameTime);
@@ -137,8 +156,10 @@ public sealed class GameMain : IDisposable
     /// <param name="gameTime">Snapshot of the game's timing state.</param>
     public void Draw(GameTime gameTime)
     {
+        var viewport = _gameWrapper.GraphicsDevice.Viewport;
+
         _gameWrapper.Window.Title = $"{1 / gameTime.ElapsedGameTime.TotalSeconds:N0} FPS";
-        _camera.ScreenViewport = _gameWrapper.GraphicsDevice.Viewport;
+        _camera.ScreenViewport = new Size(viewport.Width, viewport.Height);
         _camera.Update();
 
         _deferredRenderer.Begin(_camera);

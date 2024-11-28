@@ -1,5 +1,6 @@
 // Copyright (c) Eiveo GmbH. All rights reserved.
 
+using System.Numerics;
 using Microsoft.Xna.Framework;
 using RemnantOfTheAbyss.Graphics;
 
@@ -10,17 +11,32 @@ public class Node : IDisposable
 {
     private readonly List<Node> _children = [];
 
-    private Matrix _localTransform = Matrix.Identity;
-    private Matrix _globalTransform = Matrix.Identity;
+    private Matrix4x4 _localTransform = Matrix4x4.Identity;
+    private Matrix4x4 _globalTransform = Matrix4x4.Identity;
 
     /// <summary>Gets or sets the parent node.</summary>
     public Node? Parent { get; set; }
+
+    /// <summary>Gets the world node.</summary>
+    public World? World
+    {
+        get
+        {
+            for (var current = this; current != null; current = current.Parent)
+            {
+                if (current is World world)
+                    return world;
+            }
+
+            return null;
+        }
+    }
 
     /// <summary>Gets the children of the node.</summary>
     public IReadOnlyCollection<Node> Children => _children;
 
     /// <summary>Gets or sets the transformation matrix of the node.</summary>
-    public Matrix LocalTransform
+    public Matrix4x4 LocalTransform
     {
         get => _localTransform;
         set
@@ -31,7 +47,7 @@ public class Node : IDisposable
     }
 
     /// <summary>Gets or sets the transformation matrix of the node.</summary>
-    public Matrix GlobalTransform
+    public Matrix4x4 GlobalTransform
     {
         get => _globalTransform;
         set
@@ -116,7 +132,15 @@ public class Node : IDisposable
 
     private void UpdateLocalTransform()
     {
-        _localTransform = Parent != null ? Matrix.Invert(Parent.GlobalTransform) * _globalTransform : _globalTransform;
+        if (Parent != null)
+        {
+            _ = Matrix4x4.Invert(Parent.GlobalTransform, out var inverseParentGlobalTransform);
+            _localTransform = inverseParentGlobalTransform * _globalTransform;
+        }
+        else
+        {
+            _localTransform = _globalTransform;
+        }
 
         foreach (var child in _children)
             child.UpdateGlobalTransform();

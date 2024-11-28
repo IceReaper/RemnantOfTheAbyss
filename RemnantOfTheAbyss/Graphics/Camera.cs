@@ -1,7 +1,7 @@
 // Copyright (c) Eiveo GmbH. All rights reserved.
 
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
+using System.Drawing;
+using System.Numerics;
 
 namespace RemnantOfTheAbyss.Graphics;
 
@@ -15,19 +15,19 @@ public class Camera
     public Vector3 Rotation { get; set; }
 
     /// <summary>Gets or sets the screen viewport.</summary>
-    public Viewport ScreenViewport { get; set; }
+    public Size ScreenViewport { get; set; }
 
     /// <summary>Gets the world viewport.</summary>
-    public Viewport WorldViewport { get; private set; }
+    public Size WorldViewport { get; private set; }
 
     /// <summary>Gets the view matrix.</summary>
-    public Matrix View { get; private set; }
+    public Matrix4x4 View { get; private set; }
 
     /// <summary>Gets the projection matrix.</summary>
-    public Matrix Projection { get; private set; }
+    public Matrix4x4 Projection { get; private set; }
 
     /// <summary>Gets or sets the target viewport.</summary>
-    public Vector2 TargetViewport { get; set; }
+    public Size TargetViewport { get; set; }
 
     /// <summary>Gets or sets the zoom.</summary>
     public float Zoom { get; set; } = 1;
@@ -35,22 +35,14 @@ public class Camera
     /// <summary>Updates the camera matrices.</summary>
     public void Update()
     {
-        var baseAspect = TargetViewport.X / TargetViewport.Y;
-        var windowAspect = (float)ScreenViewport.Width / ScreenViewport.Height;
+        var targetAspect = TargetViewport.Width / TargetViewport.Height;
+        var screenAspect = (float)ScreenViewport.Width / ScreenViewport.Height;
 
-        var framebufferWidth = (int)TargetViewport.X;
-        var framebufferHeight = (int)TargetViewport.Y;
+        var framebufferWidth = ((screenAspect > targetAspect ? (int)Math.Ceiling(TargetViewport.Height * screenAspect) : TargetViewport.Width) + 1) >> 1 << 1;
+        var framebufferHeight = ((screenAspect < targetAspect ? (int)Math.Ceiling(TargetViewport.Width / screenAspect) : TargetViewport.Height) + 1) >> 1 << 1;
 
-        if (windowAspect > baseAspect)
-            framebufferWidth = (int)Math.Ceiling(TargetViewport.Y * windowAspect);
-        else if (windowAspect < baseAspect)
-            framebufferHeight = (int)Math.Ceiling(TargetViewport.X / windowAspect);
-
-        framebufferWidth = (framebufferWidth + 1) >> 1 << 1;
-        framebufferHeight = (framebufferHeight + 1) >> 1 << 1;
-
-        WorldViewport = new Viewport(0, 0, framebufferWidth, framebufferHeight);
-        Projection = Matrix.CreateOrthographicOffCenter(
+        WorldViewport = new Size(framebufferWidth, framebufferHeight);
+        Projection = Matrix4x4.CreateOrthographicOffCenter(
             framebufferWidth / -2f * Zoom,
             framebufferWidth / 2f * Zoom,
             framebufferHeight / 2f * Zoom,
@@ -64,14 +56,13 @@ public class Camera
         var x = (float)Math.Cos(angleY) * (float)Math.Cos(angleUp);
         var y = (float)Math.Sin(angleUp);
         var z = (float)Math.Sin(angleY) * (float)Math.Cos(angleUp);
-        var rotationMatrix = Matrix.CreateLookAt(Vector3.Zero, Vector3.Normalize(new Vector3(x, y, z)), Vector3.Up);
 
-        var transformedPosition = Vector3.Transform(Position, rotationMatrix);
-        transformedPosition = new Vector3(MathF.Round(transformedPosition.X), MathF.Round(transformedPosition.Y), MathF.Round(transformedPosition.Z));
+        var rotationMatrix = Matrix4x4.CreateLookAt(Vector3.Zero, Vector3.Normalize(new Vector3(x, y, z)), Vector3.UnitY);
+        _ = Matrix4x4.Invert(rotationMatrix, out var inverseRotationMatrix);
 
-        var position = Vector3.Transform(transformedPosition, Matrix.Invert(rotationMatrix));
+        var position = Vector3.Transform(Vector3.Round(Vector3.Transform(Position, rotationMatrix)), inverseRotationMatrix);
         var direction = Vector3.Normalize(new Vector3(x, y, z));
 
-        View = Matrix.CreateLookAt(position, position + direction, Vector3.Up);
+        View = Matrix4x4.CreateLookAt(position, position + direction, Vector3.UnitY);
     }
 }

@@ -64,7 +64,7 @@ public class EntityClassBuilder
 
             _ = sb.AppendLine($"        if (entity.Properties.TryGetValue(\"{lowercaseName}\", out var {lowercaseName}))");
 
-            if (property.Type is "string")
+            if (property.Type is "string" or "string?")
             {
                 _ = sb.AppendLine($"            result.{property.Name} = {lowercaseName};");
             }

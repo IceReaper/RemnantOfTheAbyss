@@ -15,11 +15,11 @@ public class GameConfigurationBuilder
 
         sb = sb
             .AppendLine("{")
-            .AppendLine("    \"version\": 9,")
+            .AppendLine("    \"version\": 8,")
             .AppendLine($"    \"name\": \"{game}\",")
             .AppendLine("    \"fileformats\": [ { \"format\": \"Valve\" } ],")
             .AppendLine("    \"filesystem\": { \"searchpath\": \".\", \"packageformat\": { \"extension\": \".zip\", \"format\": \"zip\" } },")
-            .AppendLine("    \"materials\": { \"root\": \"Textures\", \"format\": { \"extensions\": [ \".png\" ], \"format\": \"image\" } },")
+            .AppendLine("    \"textures\": { \"root\": \"Textures\", \"format\": { \"extensions\": [ \".png\" ], \"format\": \"image\" } },")
             .AppendLine("    \"entities\": { \"definitions\": [ \"Entities.fgd\" ], \"defaultcolor\": \"0.5 0.5 0.5 1.0\" }")
             .AppendLine("}");
 

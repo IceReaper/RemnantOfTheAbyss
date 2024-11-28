@@ -1,7 +1,7 @@
 // Copyright (c) Eiveo GmbH. All rights reserved.
 
+using System.Numerics;
 using Eiveo.TrenchBroom.Maps;
-using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using RemnantOfTheAbyss.Graphics;
 using Plane = Eiveo.TrenchBroom.Maps.Plane;
@@ -149,13 +149,13 @@ public static class MapLoader
 
     private static VertexPositionNormalTexture[] SortVertices(Plane plane, VertexPositionNormalTexture[] vertices)
     {
-        var center = vertices.Aggregate(Vector3.Zero, (current, vertex) => current + vertex.Position) / vertices.Length;
+        var center = vertices.Aggregate(Vector3.Zero, (current, vertex) => current + vertex.Position.ToNumerics()) / vertices.Length;
 
         var a = (plane.Normal - Vector3.UnitX).Length() < Delta || (plane.Normal + Vector3.UnitX).Length() < Delta ? Vector3.UnitY : Vector3.UnitX;
         var b = Vector3.Normalize(Vector3.Cross(plane.Normal, a));
         var c = Vector3.Normalize(Vector3.Cross(plane.Normal, b));
 
-        return [.. vertices.OrderByDescending(vertex => (float)Math.Atan2(Vector3.Dot(vertex.Position - center, c), Vector3.Dot(vertex.Position - center, b)))];
+        return [.. vertices.OrderByDescending(vertex => (float)Math.Atan2(Vector3.Dot(vertex.Position.ToNumerics() - center, c), Vector3.Dot(vertex.Position.ToNumerics() - center, b)))];
     }
 
     private static Vector2 CalculateUv(Plane plane, Vector3 vertex)

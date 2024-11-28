@@ -1,8 +1,10 @@
 // Copyright (c) Eiveo GmbH. All rights reserved.
 
-using Microsoft.Xna.Framework;
+using System.Drawing;
+using System.Numerics;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
+using RemnantOfTheAbyss.Extensions;
 
 namespace RemnantOfTheAbyss.Graphics;
 
@@ -17,7 +19,7 @@ public sealed class DeferredRenderer : IDisposable
     private RenderTarget2D _normal;
     private RenderTarget2D _albedo;
 
-    private Viewport _viewport;
+    private Size _viewport;
 
     /// <summary>Initializes a new instance of the <see cref="DeferredRenderer"/> class.</summary>
     /// <param name="graphicsDevice">The graphics device.</param>
@@ -28,9 +30,11 @@ public sealed class DeferredRenderer : IDisposable
         _spriteBatch = new SpriteBatch(_graphicsDevice);
         _renderInfoBuffersEffect = content.Load<Effect>("Effects/RenderIntoBuffers");
 
-        _position = new RenderTarget2D(_graphicsDevice, _graphicsDevice.Viewport.Width, _graphicsDevice.Viewport.Height, false, SurfaceFormat.Color, DepthFormat.Depth24Stencil8);
-        _normal = new RenderTarget2D(_graphicsDevice, _graphicsDevice.Viewport.Width, _graphicsDevice.Viewport.Height, false, SurfaceFormat.Color, DepthFormat.None);
-        _albedo = new RenderTarget2D(_graphicsDevice, _graphicsDevice.Viewport.Width, _graphicsDevice.Viewport.Height, false, SurfaceFormat.Color, DepthFormat.None);
+        var viewport = _graphicsDevice.Viewport;
+
+        _position = new RenderTarget2D(_graphicsDevice, viewport.Width, viewport.Height, false, SurfaceFormat.Color, DepthFormat.Depth24Stencil8);
+        _normal = new RenderTarget2D(_graphicsDevice, viewport.Width, viewport.Height, false, SurfaceFormat.Color, DepthFormat.None);
+        _albedo = new RenderTarget2D(_graphicsDevice, viewport.Width, viewport.Height, false, SurfaceFormat.Color, DepthFormat.None);
     }
 
     /// <summary>Gets or sets a value indicating whether to draw debug information.</summary>
@@ -42,26 +46,28 @@ public sealed class DeferredRenderer : IDisposable
     {
         _viewport = camera.ScreenViewport;
 
-        if (_position.Width != camera.WorldViewport.Width || _position.Height != camera.WorldViewport.Height)
+        var worldViewport = camera.WorldViewport;
+
+        if (_position.Width != worldViewport.Width || _position.Height != worldViewport.Height)
         {
             _position.Dispose();
-            _position = new RenderTarget2D(_graphicsDevice, camera.WorldViewport.Width, camera.WorldViewport.Height, false, SurfaceFormat.Color, DepthFormat.Depth24Stencil8);
+            _position = new RenderTarget2D(_graphicsDevice, worldViewport.Width, worldViewport.Height, false, SurfaceFormat.Color, DepthFormat.Depth24Stencil8);
         }
 
-        if (_normal.Width != camera.WorldViewport.Width || _normal.Height != camera.WorldViewport.Height)
+        if (_normal.Width != worldViewport.Width || _normal.Height != worldViewport.Height)
         {
             _normal.Dispose();
-            _normal = new RenderTarget2D(_graphicsDevice, camera.WorldViewport.Width, camera.WorldViewport.Height, false, SurfaceFormat.Color, DepthFormat.None);
+            _normal = new RenderTarget2D(_graphicsDevice, worldViewport.Width, worldViewport.Height, false, SurfaceFormat.Color, DepthFormat.None);
         }
 
-        if (_albedo.Width != camera.WorldViewport.Width || _albedo.Height != camera.WorldViewport.Height)
+        if (_albedo.Width != worldViewport.Width || _albedo.Height != worldViewport.Height)
         {
             _albedo.Dispose();
-            _albedo = new RenderTarget2D(_graphicsDevice, camera.WorldViewport.Width, camera.WorldViewport.Height, false, SurfaceFormat.Color, DepthFormat.None);
+            _albedo = new RenderTarget2D(_graphicsDevice, worldViewport.Width, worldViewport.Height, false, SurfaceFormat.Color, DepthFormat.None);
         }
 
         _graphicsDevice.SetRenderTargets(_position, _normal, _albedo);
-        _graphicsDevice.Clear(Color.Transparent);
+        _graphicsDevice.Clear(Color.Empty.ToMonoGame());
 
         _renderInfoBuffersEffect.Parameters["View"].SetValue(camera.View);
         _renderInfoBuffersEffect.Parameters["Projection"].SetValue(camera.Projection);
@@ -72,7 +78,7 @@ public sealed class DeferredRenderer : IDisposable
     /// <summary>Draws a mesh.</summary>
     /// <param name="mesh">The mesh to draw.</param>
     /// <param name="transform">The transformation matrix.</param>
-    public void Draw(Mesh mesh, Matrix transform)
+    public void Draw(Mesh mesh, Matrix4x4 transform)
     {
         _graphicsDevice.SetVertexBuffer(mesh.VertexBuffer);
         _graphicsDevice.Indices = mesh.IndexBuffer;
@@ -88,7 +94,7 @@ public sealed class DeferredRenderer : IDisposable
     public void End()
     {
         _graphicsDevice.SetRenderTarget(null);
-        _graphicsDevice.Clear(Color.Black);
+        _graphicsDevice.Clear(Color.Black.ToMonoGame());
 
         // TODO this should be the final output!
         var outputs = new List<RenderTarget2D> { _albedo };
@@ -116,7 +122,15 @@ public sealed class DeferredRenderer : IDisposable
                 if (index >= outputs.Count)
                     break;
 
-                _spriteBatch.Draw(outputs[index], new Rectangle(x * width, y * height, width, height), null, Color.White, 0, Vector2.Zero, SpriteEffects.FlipVertically | SpriteEffects.FlipHorizontally, 0);
+                _spriteBatch.Draw(
+                    outputs[index],
+                    new Rectangle(x * width, y * height, width, height).ToMonoGame(),
+                    null,
+                    Color.White.ToMonoGame(),
+                    0,
+                    Vector2.Zero,
+                    SpriteEffects.FlipVertically | SpriteEffects.FlipHorizontally,
+                    0);
             }
         }
 

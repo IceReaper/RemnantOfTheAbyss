@@ -17,22 +17,32 @@ public sealed class AssetManager : IDisposable
     /// <summary>Gets the dummy texture.</summary>
     public required Texture2D DummyTexture { get; init; }
 
+    /// <summary>Gets the dummy model.</summary>
+    public required Model DummyModel { get; init; }
+
     /// <summary>Loads a texture from the content folder.</summary>
     /// <param name="name">The name of the texture to load.</param>
     /// <param name="owner">The owner object.</param>
     /// <returns>The loaded texture.</returns>
     public Texture2D LoadTexture(string name, object owner)
     {
-        return LoadAsset<Texture2D>($"Textures/{name}.png", owner, path =>
+        return LoadAsset<Texture2D>(name, owner, path =>
         {
             if (!File.Exists(path))
-            {
                 return DummyTexture;
-            }
 
             using var stream = File.OpenRead(path);
             return Texture2D.FromStream(GraphicsDevice, stream);
         });
+    }
+
+    /// <summary>Loads a model from the content folder.</summary>
+    /// <param name="name">The name of the model to load.</param>
+    /// <param name="owner">The owner object.</param>
+    /// <returns>The loaded model.</returns>
+    public Model LoadModel(string name, object owner)
+    {
+        return LoadAsset<Model>(name, owner, path => !File.Exists(path) ? DummyModel : Model.FromPath(GraphicsDevice, this, path));
     }
 
     /// <summary>Removes the owner from all its assets and unloads asset without remaining owner.</summary>
