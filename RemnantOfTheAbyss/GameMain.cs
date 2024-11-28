@@ -7,6 +7,8 @@ using Microsoft.Xna.Framework.Input;
 using RemnantOfTheAbyss.Assets;
 using RemnantOfTheAbyss.Entities;
 using RemnantOfTheAbyss.Graphics;
+using RemnantOfTheAbyss.Input;
+using RemnantOfTheAbyss.Input.Enums;
 using RemnantOfTheAbyss.Nodes;
 
 namespace RemnantOfTheAbyss;
@@ -19,6 +21,7 @@ public sealed class GameMain : IDisposable
     private readonly DeferredRenderer _deferredRenderer;
     private readonly Camera _camera;
     private readonly List<Node> _scene = [];
+    private readonly InputManager _inputManager;
 
     /// <summary>Initializes a new instance of the <see cref="GameMain"/> class.</summary>
     /// <param name="gameWrapper">The game wrapper.</param>
@@ -49,6 +52,8 @@ public sealed class GameMain : IDisposable
             TargetViewport = new Vector2(640, 480),
         };
 
+        _inputManager = new InputManager();
+
         // TODO hardcoded content
         using var stream = File.OpenRead("Maps/Test.map");
         using var reader = new StreamReader(stream);
@@ -77,26 +82,26 @@ public sealed class GameMain : IDisposable
     /// <param name="gameTime">Snapshot of the game's timing state.</param>
     public void Update(GameTime gameTime)
     {
-        var keyboard = Keyboard.GetState();
-        var gamepad = GamePad.GetState(0);
+        _inputManager.Update();
+
         var move = Vector3.Zero;
 
-        if (keyboard.IsKeyDown(Keys.W) || gamepad.ThumbSticks.Left.Y >= .5)
+        if (_inputManager.IsPressed(Keys.W) || _inputManager.GetGamePadThumbStick(GamePadThumbStick.Left).Y >= .5)
             move.Z += 1f;
 
-        if (keyboard.IsKeyDown(Keys.S) || gamepad.ThumbSticks.Left.Y <= -.5)
+        if (_inputManager.IsPressed(Keys.S) || _inputManager.GetGamePadThumbStick(GamePadThumbStick.Left).Y <= -.5)
             move.Z -= 1f;
 
-        if (keyboard.IsKeyDown(Keys.A) || gamepad.ThumbSticks.Left.X <= -.5)
+        if (_inputManager.IsPressed(Keys.A) || _inputManager.GetGamePadThumbStick(GamePadThumbStick.Left).X <= -.5)
             move.X -= 1f;
 
-        if (keyboard.IsKeyDown(Keys.D) || gamepad.ThumbSticks.Left.X >= .5)
+        if (_inputManager.IsPressed(Keys.D) || _inputManager.GetGamePadThumbStick(GamePadThumbStick.Left).X >= .5)
             move.X += 1f;
 
-        if (keyboard.IsKeyDown(Keys.LeftControl) || gamepad.IsButtonDown(Buttons.DPadUp))
+        if (_inputManager.IsPressed(Keys.LeftControl) || _inputManager.IsPressed(Buttons.DPadUp))
             move.Y -= 1f;
 
-        if (keyboard.IsKeyDown(Keys.Space) || gamepad.IsButtonDown(Buttons.DPadDown))
+        if (_inputManager.IsPressed(Keys.Space) || _inputManager.IsPressed(Buttons.DPadDown))
             move.Y += 1f;
 
         if (move.Length() > 1)
@@ -113,7 +118,7 @@ public sealed class GameMain : IDisposable
             _camera.Position += new Vector3((float)x, y, (float)z) * (float)gameTime.ElapsedGameTime.TotalSeconds * 512;
         }
 
-        if (keyboard.IsKeyDown(Keys.P) || gamepad.IsButtonDown(Buttons.Back))
+        if ((_inputManager.IsPressed(Keys.P) && !_inputManager.WasPressed(Keys.P)) || (_inputManager.IsPressed(Buttons.Back) && !_inputManager.WasPressed(Buttons.Back)))
             _deferredRenderer.Debug = !_deferredRenderer.Debug;
 
         foreach (var node in _scene)
